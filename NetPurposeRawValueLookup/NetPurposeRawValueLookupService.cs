@@ -99,13 +99,9 @@ public static class NetPurposeRawValueLookupService
             issuer.NetPurposeNewCustomersPreviouslyExcludedMetricValue = FindNearest(byQuestion, 237, issuer.ReportingDate);
             issuer.NetPurposeInsurancePoliciesPreviouslyExcludedMetricValue = FindNearest(byQuestion, 220, issuer.ReportingDate);
             issuer.NetPurposeEnergyConsumedRenewablePercentMetricValue = FindNearest(byQuestion, 157, issuer.ReportingDate);
-
-            // QuestionId 143 = "R&D investment, % of revenue" (percentage)
-            // QuestionId 268 = "R&d investment" (absolute value)
-            // Both map to NetPurposeRandDInvestmentPercentOfRevenueMetricValue — 143 takes precedence.
-            issuer.NetPurposeRandDInvestmentPercentOfRevenueMetricValue =
-                FindNearest(byQuestion, 143, issuer.ReportingDate)
-                ?? FindNearest(byQuestion, 268, issuer.ReportingDate);
+            
+            issuer.NetPurposeRandDInvestmentPercentOfRevenueMetricValue = FindNearest(byQuestion, 143, issuer.ReportingDate);
+            issuer.NetPurposeRandDInvestmentMetricRawValue = FindNearest(byQuestion, 268, issuer.ReportingDate);
         }
     }
 

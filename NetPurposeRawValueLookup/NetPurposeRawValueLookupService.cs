@@ -83,21 +83,23 @@ public static class NetPurposeRawValueLookupService
                 if (!netPurposeRawMetricsByIssuer.TryGetValue(vesgIssuerData.AladdinIssuerId, out var issuerMetrics))
                     continue;
 
-                vesgIssuerData.NetPurposeFemaleManagersPercentValue          = FindNearest(issuerMetrics, 209,  vesgIssuerData.ReportingDate);
-                vesgIssuerData.NetPurposePatientsTreatedMetricValue          = FindNearest(issuerMetrics, 132,  vesgIssuerData.ReportingDate);
-                vesgIssuerData.NetPurposeNewCustomersMetricValue             = FindNearest(issuerMetrics, 236,  vesgIssuerData.ReportingDate);
-                vesgIssuerData.NetPurposeFemaleEmployeesPercentValue         = FindNearest(issuerMetrics, 210,  vesgIssuerData.ReportingDate);
-                vesgIssuerData.NetPurposeCustomersMetricValue                = FindNearest(issuerMetrics, 219,  vesgIssuerData.ReportingDate);
-                vesgIssuerData.NetPurposeCustomersPreviouslyExcludedMetricValue = FindNearest(issuerMetrics, 228, vesgIssuerData.ReportingDate);
-                vesgIssuerData.NetPurposeOperationalWasteRecycledPercentMetricValue = FindNearest(issuerMetrics, 76, vesgIssuerData.ReportingDate);
-                vesgIssuerData.NetPurposeGrossInsurancePremiumsPreviouslyExcludedMetricValue = FindNearest(issuerMetrics, 225, vesgIssuerData.ReportingDate);
-                vesgIssuerData.NetPurposeFemaleboardMembersPercentMetricValue = FindNearest(issuerMetrics, 208, vesgIssuerData.ReportingDate);
-                vesgIssuerData.NetPurposeCeoMedianEmployeeCompensationRatioMetricValue = FindNearest(issuerMetrics, 7906, vesgIssuerData.ReportingDate);
-                vesgIssuerData.NetPurposeNewCustomersPreviouslyExcludedMetricValue = FindNearest(issuerMetrics, 237, vesgIssuerData.ReportingDate);
-                vesgIssuerData.NetPurposeInsurancePoliciesPreviouslyExcludedMetricValue = FindNearest(issuerMetrics, 220, vesgIssuerData.ReportingDate);
-                vesgIssuerData.NetPurposeEnergyConsumedRenewablePercentMetricValue = FindNearest(issuerMetrics, 157, vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeFemaleManagersPercentRawValue          = FindNearest(issuerMetrics, 209,  vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposePatientsTreatedMetricRawValue          = FindNearest(issuerMetrics, 132,  vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeNewCustomersMetricRawValue             = FindNearest(issuerMetrics, 236,  vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeFemaleEmployeesPercentRawValue         = FindNearest(issuerMetrics, 210,  vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeCustomersMetricRawValue                = FindNearest(issuerMetrics, 219,  vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeCustomersPreviouslyExcludedMetricRawValue = FindNearest(issuerMetrics, 228, vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeOperationalWasteRecycledPercentMetricRawValue = FindNearest(issuerMetrics, 76, vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeGrossInsurancePremiumsPreviouslyExcludedMetricRawValue = FindNearest(issuerMetrics, 225, vesgIssuerData.ReportingDate);
+                
+                vesgIssuerData.NetPurposeFemaleboardMembersPercentMetricRawValue = FindNearest(issuerMetrics, 208, vesgIssuerData.ReportingDate);
+                
+                vesgIssuerData.NetPurposeCeoMedianEmployeeCompensationRatioMetricRawValue = FindNearest(issuerMetrics, 7906, vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeNewCustomersPreviouslyExcludedMetricRawValue = FindNearest(issuerMetrics, 237, vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeInsurancePoliciesPreviouslyExcludedMetricRawValue = FindNearest(issuerMetrics, 220, vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeEnergyConsumedRenewablePercentMetricRawValue = FindNearest(issuerMetrics, 157, vesgIssuerData.ReportingDate);
 
-                vesgIssuerData.NetPurposeRandDInvestmentPercentOfRevenueMetricValue = FindNearest(issuerMetrics, 143, vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeRandDInvestmentPercentOfRevenueMetricRawValue = FindNearest(issuerMetrics, 143, vesgIssuerData.ReportingDate);
                 vesgIssuerData.NetPurposeRandDInvestmentMetricRawValue = FindNearest(issuerMetrics, 268, vesgIssuerData.ReportingDate);
             }
         }
@@ -108,7 +110,7 @@ public static class NetPurposeRawValueLookupService
         DateOnly reportingDate)
     {
         return netPurposeRawIssuerMetrics
-            .Where(m => m.QuestionId == questionId && m.ReportingEnd <= reportingDate && m.StandardizedValue.HasValue)
+            .Where(m => m.QuestionId == questionId && m.ReportingEnd <= reportingDate)
             .OrderByDescending(m => m.ReportingEnd)
             .FirstOrDefault()
             ?.StandardizedValue;

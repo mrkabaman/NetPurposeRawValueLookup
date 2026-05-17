@@ -38,31 +38,31 @@ public class EsgIssuer
     public decimal? NetPurposeGrossInsurancePremiumsPreviouslyExcludedMetricValue { get; set; }
     
     
-    /**
+   
      // --- Net Purpose Metrics Raw Values ---
 
-public decimal? NetPurposeEvicRawValue { get; set; }
-public decimal? NetPurposeFemaleEmployeesPercentRawValue { get; set; }
-public decimal? NetPurposeFemaleManagersPercentRawValue { get; set; }
-public decimal? NetPurposeOperationalWasteGeneratedRawValue { get; set; }
-public decimal? NetPurposeWaterConsumedRawValue { get; set; }
+    public decimal? NetPurposeEvicRawValue { get; set; }
+    public decimal? NetPurposeFemaleEmployeesPercentRawValue { get; set; }
+    public decimal? NetPurposeFemaleManagersPercentRawValue { get; set; }
+    public decimal? NetPurposeOperationalWasteGeneratedRawValue { get; set; }
+    public decimal? NetPurposeWaterConsumedRawValue { get; set; }
 
-// --- Additional Net Purpose Metrics RawValue---
-public decimal? NetPurposeOperationalWasteRecycledPercentMetricRawValue { get; set; }
-public decimal? NetPurposeCeoMedianEmployeeCompensationRatioMetricRawValue { get; set; }
-public decimal? NetPurposeFemaleboardMembersPercentMetricRawValue { get; set; }
-public decimal? NetPurposeEnergyConsumedRenewablePercentMetricRawValue { get; set; }
-public decimal? NetPurposeRandDInvestmentPercentOfRevenueMetricRawValue { get; set; }
-public decimal? NetPurposeCustomersMetricRawValue { get; set; }
-public decimal? NetPurposeCustomersPreviouslyExcludedMetricRawValue { get; set; }
-public decimal? NetPurposeNewCustomersMetricRawValue { get; set; }
-public decimal? NetPurposeNewCustomersPreviouslyExcludedMetricRawValue { get; set; }
-public decimal? NetPurposeInsurancePoliciesPreviouslyExcludedMetricRawValue { get; set; }
-public decimal? NetPurposePatientsTreatedMetricRawValue { get; set; }
-public decimal? NetPurposeRandDInvestmentMetricRawValue { get; set; }
-public decimal? NetPurposeGrossInsurancePremiumsPreviouslyExcludedMetricRawValue { get; set; }
+    // --- Additional Net Purpose Metrics RawValue---
+    public decimal? NetPurposeOperationalWasteRecycledPercentMetricRawValue { get; set; }
+    public decimal? NetPurposeCeoMedianEmployeeCompensationRatioMetricRawValue { get; set; }
+    public decimal? NetPurposeFemaleboardMembersPercentMetricRawValue { get; set; }
+    public decimal? NetPurposeEnergyConsumedRenewablePercentMetricRawValue { get; set; }
+    public decimal? NetPurposeRandDInvestmentPercentOfRevenueMetricRawValue { get; set; }
+    public decimal? NetPurposeCustomersMetricRawValue { get; set; }
+    public decimal? NetPurposeCustomersPreviouslyExcludedMetricRawValue { get; set; }
+    public decimal? NetPurposeNewCustomersMetricRawValue { get; set; }
+    public decimal? NetPurposeNewCustomersPreviouslyExcludedMetricRawValue { get; set; }
+    public decimal? NetPurposeInsurancePoliciesPreviouslyExcludedMetricRawValue { get; set; }
+    public decimal? NetPurposePatientsTreatedMetricRawValue { get; set; }
+    public decimal? NetPurposeRandDInvestmentMetricRawValue { get; set; }
+    public decimal? NetPurposeGrossInsurancePremiumsPreviouslyExcludedMetricRawValue { get; set; }
      
-     */
+  
     
     
 }

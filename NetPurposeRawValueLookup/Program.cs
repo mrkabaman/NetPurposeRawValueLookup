@@ -1,7 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-//Console.WriteLine("Hello, World!");
-
-
+﻿
 using Microsoft.Extensions.Configuration;
 using Serilog;
 namespace NetPurposeRawValueLookup;
@@ -10,7 +7,7 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-       var configuration = new ConfigurationBuilder()
+        var configuration = new ConfigurationBuilder()
             .SetBasePath(AppContext.BaseDirectory)
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .AddEnvironmentVariables()
@@ -20,39 +17,44 @@ internal class Program
             .ReadFrom.Configuration(configuration)
             .CreateLogger();
 
-       
-            try
-            {
-                Log.Information("Application starting");
+        try
+        {
+            Log.Information("Application starting");
 
-                var lookupTable = configuration["NetPurpose:RawValueLookupTable"];
-                var batchSize = configuration.GetValue<int>("NetPurpose:BatchSize");
+            var csvFilePath = configuration["NetPurpose:CsvFilePath"]
+                              ?? "NetPurposeSnowflakeReportingDateSorted.csv";
 
-                Log.Information("Lookup table: {LookupTable}", lookupTable);
-                Log.Information("Batch size: {BatchSize}", batchSize);
+            var rawMetricsFilePath = configuration["NetPurpose:RawMetricsCsvFilePath"]
+                                     ?? "NetPurposeRawMetrics.csv";
 
-                foreach (var arg in args)
-                    Log.Debug("Argument: {Arg}", arg);
+            var outputFilePath = configuration["NetPurpose:OutputCsvFilePath"]
+                                 ?? "EsgIssuerWithRawValues.csv";
 
-                var csvFilePath = configuration["NetPurpose:CsvFilePath"]
-                                  ?? "NetPurposeSnowflakeReportingDateSorted.csv";
+            // 1. Read EsgIssuers
+            var issuers = EsgIssuerCsvReader.ReadFromFile(csvFilePath);
+            Log.Information("Loaded {IssuerCount} issuers from CSV", issuers.Count);
 
-                var issuers = EsgIssuerCsvReader.ReadFromFile(csvFilePath);
-                Log.Information("Loaded {IssuerCount} issuers from CSV", issuers.Count);
+            // 2. Read NetPurposeMetrics
+            var metrics = NetPurposeMetricCsvReader.ReadFromFile(rawMetricsFilePath);
+            Log.Information("Loaded {MetricCount} raw metrics from CSV", metrics.Count);
 
-                var rawNetPurpose = NetPurposeMetricCsvReader.ReadFromFile("NetPurposeRawMetrics.csv");
-                Log.Information("Loaded {MetricCount} raw metrics from CSV", rawNetPurpose.Count);
+            // 3. Apply raw value lookup
+            NetPurposeRawValueLookupService.ApplyRawValues(issuers, metrics);
+            Log.Information("Raw value lookup applied");
 
-                Log.Information("Application finished successfully");
-            }
-            catch (Exception ex)
-            {
-                Log.Fatal(ex, "Application terminated unexpectedly");
-            }
-            finally
-            {
-                Log.CloseAndFlush();
-            }
-        
+            // 4. Write output CSV with all properties including RawValue fields
+            EsgIssuerCsvWriter.WriteToFile(outputFilePath, issuers);
+            Log.Information("Output written to {OutputFilePath}", outputFilePath);
+
+            Log.Information("Application finished successfully");
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Application terminated unexpectedly");
+        }
+        finally
+        {
+            Log.CloseAndFlush();
+        }
     }
 }

@@ -39,8 +39,8 @@ internal class Program
             Log.Information("Loaded {MetricCount} raw NetPurpose metrics from CSV", rawNetPurposeMetrics.Count);
 
             // 3. Apply raw value lookup
-            NetPurposeRawValueLookupService.ApplyRawValues(snowflakeIssuers, rawNetPurposeMetrics);
-            Log.Information("Raw value lookup applied");
+            NetPurposeRawValueLookupService.ApplyRawValuesUsingEvic(snowflakeIssuers, rawNetPurposeMetrics);
+            Log.Information("Raw value dependent on Evic lookup applied");
             
             // 4. Apply individual metric value lookup (one question → one field, nearest date)
             NetPurposeRawValueLookupService.ApplyMetricValues(snowflakeIssuers, rawNetPurposeMetrics);

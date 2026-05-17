@@ -7,7 +7,7 @@ public static class NetPurposeRawValueLookupService
     /// matching the AladdinIssuerId, satisfying the question/value conditions, and copies
     /// StandardizedValues into the corresponding RawValue fields.
     /// </summary>
-    public static void ApplyRawValues(
+    public static void ApplyRawValuesUsingEvic(
         IReadOnlyList<EsgIssuer> issuers,
         IReadOnlyList<NetPurposeMetric> metrics)
     {

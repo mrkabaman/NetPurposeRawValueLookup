@@ -41,8 +41,12 @@ internal class Program
             // 3. Apply raw value lookup
             NetPurposeRawValueLookupService.ApplyRawValues(snowflakeIssuers, rawNetPurposeMetrics);
             Log.Information("Raw value lookup applied");
+            
+            // 4. Apply individual metric value lookup (one question → one field, nearest date)
+            NetPurposeRawValueLookupService.ApplyMetricValues(snowflakeIssuers, rawNetPurposeMetrics);
+            Log.Information("Metric value lookup applied");
 
-            // 4. Write output CSV with all properties including RawValue fields
+            // 5. Write output CSV with all properties including RawValue fields
             EsgIssuerCsvWriter.WriteToFile(outputFilePath, snowflakeIssuers);
             Log.Information("Output written to {OutputFilePath}", outputFilePath);
 

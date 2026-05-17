@@ -3,7 +3,7 @@ namespace NetPurposeRawValueLookup;
 public static class NetPurposeRawValueLookupService
 {
     /// <summary>
-    /// For each EsgIssuer, finds the closest NetPurposeMetric ReportingEnd that is <= ReportingDate,
+    /// For each EsgIssuer, finds the closest NetPurposeMetric ReportingEnd that is &lt;= ReportingDate,
     /// matching the AladdinIssuerId, satisfying the question/value conditions, and copies
     /// StandardizedValues into the corresponding RawValue fields.
     /// </summary>
@@ -11,7 +11,6 @@ public static class NetPurposeRawValueLookupService
         IReadOnlyList<EsgIssuer> issuers,
         IReadOnlyList<NetPurposeMetric> metrics)
     {
-        // Group metrics by AladdinIssuerId for faster lookup
         var metricsByIssuer = metrics
             .Where(m => m.AladdinIssuerId != null)
             .GroupBy(m => m.AladdinIssuerId!)
@@ -25,7 +24,6 @@ public static class NetPurposeRawValueLookupService
             if (!metricsByIssuer.TryGetValue(issuer.AladdinIssuerId, out var issuerMetrics))
                 continue;
 
-            // Collect all distinct ReportingEnd dates that are <= ReportingDate, sorted descending
             var candidateDates = issuerMetrics
                 .Select(m => m.ReportingEnd)
                 .Where(d => d <= issuer.ReportingDate)
@@ -33,21 +31,18 @@ public static class NetPurposeRawValueLookupService
                 .OrderByDescending(d => d)
                 .ToList();
 
-            // Walk from the nearest date backwards until we find one satisfying all conditions
             foreach (var reportingEnd in candidateDates)
             {
                 var metricsAtDate = issuerMetrics
                     .Where(m => m.ReportingEnd == reportingEnd)
                     .ToList();
 
-                // Condition: QuestionId 72378 must exist with a non-null StandardizedValue
                 var evic = metricsAtDate
                     .FirstOrDefault(m => m.QuestionId == 72378 && m.StandardizedValue.HasValue);
 
                 if (evic == null)
                     continue;
 
-                // Condition: QuestionId 103 OR QuestionId 55 must exist with a non-null StandardizedValue
                 var water = metricsAtDate
                     .FirstOrDefault(m => m.QuestionId == 103 && m.StandardizedValue.HasValue);
 
@@ -57,12 +52,75 @@ public static class NetPurposeRawValueLookupService
                 if (water == null && waste == null)
                     continue;
 
-                // All conditions met — copy values and stop searching
                 issuer.NetPurposeEvicRawValue = evic.StandardizedValue;
                 issuer.NetPurposeWaterConsumedRawValue = water?.StandardizedValue;
                 issuer.NetPurposeOperationalWasteGeneratedRawValue = waste?.StandardizedValue;
                 break;
             }
         }
+    }
+
+    /// <summary>
+    /// For each EsgIssuer, independently looks up the nearest ReportingEnd &lt;= ReportingDate
+    /// for each question and copies the StandardizedValue into the corresponding metric field.
+    /// Each question is resolved independently (no cross-question conditions).
+    /// </summary>
+    public static void ApplyMetricValues(
+        IReadOnlyList<EsgIssuer> issuers,
+        IReadOnlyList<NetPurposeMetric> metrics)
+    {
+        // Group by AladdinIssuerId then by QuestionId for fast lookup
+        var metricsByIssuerAndQuestion = metrics
+            .Where(m => m.AladdinIssuerId != null)
+            .GroupBy(m => m.AladdinIssuerId!)
+            .ToDictionary(
+                g => g.Key,
+                g => g.GroupBy(m => m.QuestionId)
+                       .ToDictionary(q => q.Key, q => q.ToList()));
+
+        foreach (var issuer in issuers)
+        {
+            if (issuer.AladdinIssuerId == null)
+                continue;
+
+            if (!metricsByIssuerAndQuestion.TryGetValue(issuer.AladdinIssuerId, out var byQuestion))
+                continue;
+
+            issuer.NetPurposeFemaleManagersPercentValue          = FindNearest(byQuestion, 209,  issuer.ReportingDate);
+            issuer.NetPurposePatientsTreatedMetricValue          = FindNearest(byQuestion, 132,  issuer.ReportingDate);
+            issuer.NetPurposeNewCustomersMetricValue             = FindNearest(byQuestion, 236,  issuer.ReportingDate);
+            issuer.NetPurposeFemaleEmployeesPercentValue         = FindNearest(byQuestion, 210,  issuer.ReportingDate);
+            issuer.NetPurposeCustomersMetricValue                = FindNearest(byQuestion, 219,  issuer.ReportingDate);
+            issuer.NetPurposeCustomersPreviouslyExcludedMetricValue = FindNearest(byQuestion, 228, issuer.ReportingDate);
+            issuer.NetPurposeOperationalWasteRecycledPercentMetricValue = FindNearest(byQuestion, 76, issuer.ReportingDate);
+            issuer.NetPurposeGrossInsurancePremiumsPreviouslyExcludedMetricValue = FindNearest(byQuestion, 225, issuer.ReportingDate);
+            issuer.NetPurposeFemaleboardMembersPercentMetricValue = FindNearest(byQuestion, 208, issuer.ReportingDate);
+            issuer.NetPurposeCeoMedianEmployeeCompensationRatioMetricValue = FindNearest(byQuestion, 7906, issuer.ReportingDate);
+            issuer.NetPurposeNewCustomersPreviouslyExcludedMetricValue = FindNearest(byQuestion, 237, issuer.ReportingDate);
+            issuer.NetPurposeInsurancePoliciesPreviouslyExcludedMetricValue = FindNearest(byQuestion, 220, issuer.ReportingDate);
+            issuer.NetPurposeEnergyConsumedRenewablePercentMetricValue = FindNearest(byQuestion, 157, issuer.ReportingDate);
+
+            // QuestionId 143 = "R&D investment, % of revenue" (percentage)
+            // QuestionId 268 = "R&d investment" (absolute value)
+            // Both map to NetPurposeRandDInvestmentPercentOfRevenueMetricValue — 143 takes precedence.
+            issuer.NetPurposeRandDInvestmentPercentOfRevenueMetricValue =
+                FindNearest(byQuestion, 143, issuer.ReportingDate)
+                ?? FindNearest(byQuestion, 268, issuer.ReportingDate);
+        }
+    }
+
+    private static decimal? FindNearest(
+        Dictionary<int, List<NetPurposeMetric>> byQuestion,
+        int questionId,
+        DateOnly reportingDate)
+    {
+        if (!byQuestion.TryGetValue(questionId, out var candidates))
+            return null;
+
+        return candidates
+            .Where(m => m.ReportingEnd <= reportingDate && m.StandardizedValue.HasValue)
+            .OrderByDescending(m => m.ReportingEnd)
+            .FirstOrDefault()
+            ?.StandardizedValue;
     }
 }

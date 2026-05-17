@@ -66,55 +66,49 @@ public static class NetPurposeRawValueLookupService
     /// Each question is resolved independently (no cross-question conditions).
     /// </summary>
     public static void ApplyMetricValues(
-        IReadOnlyList<EsgIssuer> issuers,
-        IReadOnlyList<NetPurposeMetric> metrics)
-    {
-        // Group by AladdinIssuerId then by QuestionId for fast lookup
-        var metricsByIssuerAndQuestion = metrics
-            .Where(m => m.AladdinIssuerId != null)
-            .GroupBy(m => m.AladdinIssuerId!)
-            .ToDictionary(
-                g => g.Key,
-                g => g.GroupBy(m => m.QuestionId)
-                       .ToDictionary(q => q.Key, q => q.ToList()));
-
-        foreach (var issuer in issuers)
+            IReadOnlyList<EsgIssuer> issuers,
+            IReadOnlyList<NetPurposeMetric> metrics)
         {
-            if (issuer.AladdinIssuerId == null)
-                continue;
+            // Group only by AladdinIssuerId for fast lookup
+            var metricsByIssuerAndQuestion = metrics
+                .Where(m => m.AladdinIssuerId != null)
+                .GroupBy(m => m.AladdinIssuerId!)
+                .ToDictionary(g => g.Key, g => g.ToList());
 
-            if (!metricsByIssuerAndQuestion.TryGetValue(issuer.AladdinIssuerId, out var byQuestion))
-                continue;
+            foreach (var issuer in issuers)
+            {
+                if (issuer.AladdinIssuerId == null)
+                    continue;
 
-            issuer.NetPurposeFemaleManagersPercentValue          = FindNearest(byQuestion, 209,  issuer.ReportingDate);
-            issuer.NetPurposePatientsTreatedMetricValue          = FindNearest(byQuestion, 132,  issuer.ReportingDate);
-            issuer.NetPurposeNewCustomersMetricValue             = FindNearest(byQuestion, 236,  issuer.ReportingDate);
-            issuer.NetPurposeFemaleEmployeesPercentValue         = FindNearest(byQuestion, 210,  issuer.ReportingDate);
-            issuer.NetPurposeCustomersMetricValue                = FindNearest(byQuestion, 219,  issuer.ReportingDate);
-            issuer.NetPurposeCustomersPreviouslyExcludedMetricValue = FindNearest(byQuestion, 228, issuer.ReportingDate);
-            issuer.NetPurposeOperationalWasteRecycledPercentMetricValue = FindNearest(byQuestion, 76, issuer.ReportingDate);
-            issuer.NetPurposeGrossInsurancePremiumsPreviouslyExcludedMetricValue = FindNearest(byQuestion, 225, issuer.ReportingDate);
-            issuer.NetPurposeFemaleboardMembersPercentMetricValue = FindNearest(byQuestion, 208, issuer.ReportingDate);
-            issuer.NetPurposeCeoMedianEmployeeCompensationRatioMetricValue = FindNearest(byQuestion, 7906, issuer.ReportingDate);
-            issuer.NetPurposeNewCustomersPreviouslyExcludedMetricValue = FindNearest(byQuestion, 237, issuer.ReportingDate);
-            issuer.NetPurposeInsurancePoliciesPreviouslyExcludedMetricValue = FindNearest(byQuestion, 220, issuer.ReportingDate);
-            issuer.NetPurposeEnergyConsumedRenewablePercentMetricValue = FindNearest(byQuestion, 157, issuer.ReportingDate);
-            
-            issuer.NetPurposeRandDInvestmentPercentOfRevenueMetricValue = FindNearest(byQuestion, 143, issuer.ReportingDate);
-            issuer.NetPurposeRandDInvestmentMetricRawValue = FindNearest(byQuestion, 268, issuer.ReportingDate);
+                if (!metricsByIssuerAndQuestion.TryGetValue(issuer.AladdinIssuerId, out var issuerMetrics))
+                    continue;
+
+                issuer.NetPurposeFemaleManagersPercentValue          = FindNearest(issuerMetrics, 209,  issuer.ReportingDate);
+                issuer.NetPurposePatientsTreatedMetricValue          = FindNearest(issuerMetrics, 132,  issuer.ReportingDate);
+                issuer.NetPurposeNewCustomersMetricValue             = FindNearest(issuerMetrics, 236,  issuer.ReportingDate);
+                issuer.NetPurposeFemaleEmployeesPercentValue         = FindNearest(issuerMetrics, 210,  issuer.ReportingDate);
+                issuer.NetPurposeCustomersMetricValue                = FindNearest(issuerMetrics, 219,  issuer.ReportingDate);
+                issuer.NetPurposeCustomersPreviouslyExcludedMetricValue = FindNearest(issuerMetrics, 228, issuer.ReportingDate);
+                issuer.NetPurposeOperationalWasteRecycledPercentMetricValue = FindNearest(issuerMetrics, 76, issuer.ReportingDate);
+                issuer.NetPurposeGrossInsurancePremiumsPreviouslyExcludedMetricValue = FindNearest(issuerMetrics, 225, issuer.ReportingDate);
+                issuer.NetPurposeFemaleboardMembersPercentMetricValue = FindNearest(issuerMetrics, 208, issuer.ReportingDate);
+                issuer.NetPurposeCeoMedianEmployeeCompensationRatioMetricValue = FindNearest(issuerMetrics, 7906, issuer.ReportingDate);
+                issuer.NetPurposeNewCustomersPreviouslyExcludedMetricValue = FindNearest(issuerMetrics, 237, issuer.ReportingDate);
+                issuer.NetPurposeInsurancePoliciesPreviouslyExcludedMetricValue = FindNearest(issuerMetrics, 220, issuer.ReportingDate);
+                issuer.NetPurposeEnergyConsumedRenewablePercentMetricValue = FindNearest(issuerMetrics, 157, issuer.ReportingDate);
+
+                issuer.NetPurposeRandDInvestmentPercentOfRevenueMetricValue = FindNearest(issuerMetrics, 143, issuer.ReportingDate);
+                issuer.NetPurposeRandDInvestmentMetricRawValue = FindNearest(issuerMetrics, 268, issuer.ReportingDate);
+            }
         }
-    }
 
     private static decimal? FindNearest(
-        Dictionary<int, List<NetPurposeMetric>> byQuestion,
+        List<NetPurposeMetric> issuerMetrics,
         int questionId,
         DateOnly reportingDate)
     {
-        if (!byQuestion.TryGetValue(questionId, out var candidates))
-            return null;
-
-        return candidates
-            .Where(m => m.ReportingEnd <= reportingDate && m.StandardizedValue.HasValue)
+        return issuerMetrics
+            .Where(m => m.QuestionId == questionId && m.ReportingEnd <= reportingDate && m.StandardizedValue.HasValue)
             .OrderByDescending(m => m.ReportingEnd)
             .FirstOrDefault()
             ?.StandardizedValue;

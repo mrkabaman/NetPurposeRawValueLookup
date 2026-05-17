@@ -8,32 +8,32 @@ public static class NetPurposeRawValueLookupService
     /// StandardizedValues into the corresponding RawValue fields.
     /// </summary>
     public static void ApplyRawValuesUsingEvic(
-        IReadOnlyList<EsgIssuer> issuers,
-        IReadOnlyList<NetPurposeMetric> metrics)
+        IReadOnlyList<EsgIssuer> vEsgIssuers,
+        IReadOnlyList<NetPurposeMetric> netPurposeRawMetrics)
     {
-        var metricsByIssuer = metrics
+        var netPurposeMetricsByIssuer = netPurposeRawMetrics
             .Where(m => m.AladdinIssuerId != null)
             .GroupBy(m => m.AladdinIssuerId!)
             .ToDictionary(g => g.Key, g => g.ToList());
 
-        foreach (var issuer in issuers)
+        foreach (var vesgIssuerData in vEsgIssuers)
         {
-            if (issuer.AladdinIssuerId == null)
+            if (vesgIssuerData.AladdinIssuerId == null)
                 continue;
 
-            if (!metricsByIssuer.TryGetValue(issuer.AladdinIssuerId, out var issuerMetrics))
+            if (!netPurposeMetricsByIssuer.TryGetValue(vesgIssuerData.AladdinIssuerId, out var netPurposeRawIssuerMetricsLookup))
                 continue;
 
-            var candidateDates = issuerMetrics
+            var candidateDates = netPurposeRawIssuerMetricsLookup
                 .Select(m => m.ReportingEnd)
-                .Where(d => d <= issuer.ReportingDate)
+                .Where(d => d <= vesgIssuerData.ReportingDate)
                 .Distinct()
                 .OrderByDescending(d => d)
                 .ToList();
 
             foreach (var reportingEnd in candidateDates)
             {
-                var metricsAtDate = issuerMetrics
+                var metricsAtDate = netPurposeRawIssuerMetricsLookup
                     .Where(m => m.ReportingEnd == reportingEnd)
                     .ToList();
 
@@ -52,9 +52,9 @@ public static class NetPurposeRawValueLookupService
                 if (water == null && waste == null)
                     continue;
 
-                issuer.NetPurposeEvicRawValue = evic.StandardizedValue;
-                issuer.NetPurposeWaterConsumedRawValue = water?.StandardizedValue;
-                issuer.NetPurposeOperationalWasteGeneratedRawValue = waste?.StandardizedValue;
+                vesgIssuerData.NetPurposeEvicRawValue = evic.StandardizedValue;
+                vesgIssuerData.NetPurposeWaterConsumedRawValue = water?.StandardizedValue;
+                vesgIssuerData.NetPurposeOperationalWasteGeneratedRawValue = waste?.StandardizedValue;
                 break;
             }
         }
@@ -66,48 +66,48 @@ public static class NetPurposeRawValueLookupService
     /// Each question is resolved independently (no cross-question conditions).
     /// </summary>
     public static void ApplyMetricValues(
-            IReadOnlyList<EsgIssuer> issuers,
-            IReadOnlyList<NetPurposeMetric> metrics)
+            IReadOnlyList<EsgIssuer> vEsgIssuers,
+            IReadOnlyList<NetPurposeMetric> netPurposeRawMetrics)
         {
             // Group only by AladdinIssuerId for fast lookup
-            var metricsByIssuerAndQuestion = metrics
+            var netPurposeRawMetricsByIssuer = netPurposeRawMetrics
                 .Where(m => m.AladdinIssuerId != null)
                 .GroupBy(m => m.AladdinIssuerId!)
                 .ToDictionary(g => g.Key, g => g.ToList());
 
-            foreach (var issuer in issuers)
+            foreach (var vesgIssuerData in vEsgIssuers)
             {
-                if (issuer.AladdinIssuerId == null)
+                if (vesgIssuerData.AladdinIssuerId == null)
                     continue;
 
-                if (!metricsByIssuerAndQuestion.TryGetValue(issuer.AladdinIssuerId, out var issuerMetrics))
+                if (!netPurposeRawMetricsByIssuer.TryGetValue(vesgIssuerData.AladdinIssuerId, out var issuerMetrics))
                     continue;
 
-                issuer.NetPurposeFemaleManagersPercentValue          = FindNearest(issuerMetrics, 209,  issuer.ReportingDate);
-                issuer.NetPurposePatientsTreatedMetricValue          = FindNearest(issuerMetrics, 132,  issuer.ReportingDate);
-                issuer.NetPurposeNewCustomersMetricValue             = FindNearest(issuerMetrics, 236,  issuer.ReportingDate);
-                issuer.NetPurposeFemaleEmployeesPercentValue         = FindNearest(issuerMetrics, 210,  issuer.ReportingDate);
-                issuer.NetPurposeCustomersMetricValue                = FindNearest(issuerMetrics, 219,  issuer.ReportingDate);
-                issuer.NetPurposeCustomersPreviouslyExcludedMetricValue = FindNearest(issuerMetrics, 228, issuer.ReportingDate);
-                issuer.NetPurposeOperationalWasteRecycledPercentMetricValue = FindNearest(issuerMetrics, 76, issuer.ReportingDate);
-                issuer.NetPurposeGrossInsurancePremiumsPreviouslyExcludedMetricValue = FindNearest(issuerMetrics, 225, issuer.ReportingDate);
-                issuer.NetPurposeFemaleboardMembersPercentMetricValue = FindNearest(issuerMetrics, 208, issuer.ReportingDate);
-                issuer.NetPurposeCeoMedianEmployeeCompensationRatioMetricValue = FindNearest(issuerMetrics, 7906, issuer.ReportingDate);
-                issuer.NetPurposeNewCustomersPreviouslyExcludedMetricValue = FindNearest(issuerMetrics, 237, issuer.ReportingDate);
-                issuer.NetPurposeInsurancePoliciesPreviouslyExcludedMetricValue = FindNearest(issuerMetrics, 220, issuer.ReportingDate);
-                issuer.NetPurposeEnergyConsumedRenewablePercentMetricValue = FindNearest(issuerMetrics, 157, issuer.ReportingDate);
+                vesgIssuerData.NetPurposeFemaleManagersPercentValue          = FindNearest(issuerMetrics, 209,  vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposePatientsTreatedMetricValue          = FindNearest(issuerMetrics, 132,  vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeNewCustomersMetricValue             = FindNearest(issuerMetrics, 236,  vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeFemaleEmployeesPercentValue         = FindNearest(issuerMetrics, 210,  vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeCustomersMetricValue                = FindNearest(issuerMetrics, 219,  vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeCustomersPreviouslyExcludedMetricValue = FindNearest(issuerMetrics, 228, vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeOperationalWasteRecycledPercentMetricValue = FindNearest(issuerMetrics, 76, vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeGrossInsurancePremiumsPreviouslyExcludedMetricValue = FindNearest(issuerMetrics, 225, vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeFemaleboardMembersPercentMetricValue = FindNearest(issuerMetrics, 208, vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeCeoMedianEmployeeCompensationRatioMetricValue = FindNearest(issuerMetrics, 7906, vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeNewCustomersPreviouslyExcludedMetricValue = FindNearest(issuerMetrics, 237, vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeInsurancePoliciesPreviouslyExcludedMetricValue = FindNearest(issuerMetrics, 220, vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeEnergyConsumedRenewablePercentMetricValue = FindNearest(issuerMetrics, 157, vesgIssuerData.ReportingDate);
 
-                issuer.NetPurposeRandDInvestmentPercentOfRevenueMetricValue = FindNearest(issuerMetrics, 143, issuer.ReportingDate);
-                issuer.NetPurposeRandDInvestmentMetricRawValue = FindNearest(issuerMetrics, 268, issuer.ReportingDate);
+                vesgIssuerData.NetPurposeRandDInvestmentPercentOfRevenueMetricValue = FindNearest(issuerMetrics, 143, vesgIssuerData.ReportingDate);
+                vesgIssuerData.NetPurposeRandDInvestmentMetricRawValue = FindNearest(issuerMetrics, 268, vesgIssuerData.ReportingDate);
             }
         }
 
     private static decimal? FindNearest(
-        List<NetPurposeMetric> issuerMetrics,
+        List<NetPurposeMetric> netPurposeRawIssuerMetrics,
         int questionId,
         DateOnly reportingDate)
     {
-        return issuerMetrics
+        return netPurposeRawIssuerMetrics
             .Where(m => m.QuestionId == questionId && m.ReportingEnd <= reportingDate && m.StandardizedValue.HasValue)
             .OrderByDescending(m => m.ReportingEnd)
             .FirstOrDefault()

@@ -21,7 +21,7 @@ internal class Program
         {
             Log.Information("Application starting");
 
-            var csvFilePath = configuration["NetPurpose:CsvFilePath"]
+            var snowflakeCsvFilePath = configuration["NetPurpose:SnowflakeCsvFilePath"]
                               ?? "NetPurposeSnowflakeReportingDateSorted.csv";
 
             var rawMetricsFilePath = configuration["NetPurpose:RawMetricsCsvFilePath"]
@@ -31,19 +31,19 @@ internal class Program
                                  ?? "EsgIssuerWithRawValues.csv";
 
             // 1. Read EsgIssuers
-            var issuers = EsgIssuerCsvReader.ReadFromFile(csvFilePath);
-            Log.Information("Loaded {IssuerCount} issuers from CSV", issuers.Count);
+            var snowflakeIssuers = EsgIssuerCsvReader.ReadFromFile(snowflakeCsvFilePath);
+            Log.Information("Loaded {IssuerCount} issuers from Snowflake CSV", snowflakeIssuers.Count);
 
             // 2. Read NetPurposeMetrics
-            var metrics = NetPurposeMetricCsvReader.ReadFromFile(rawMetricsFilePath);
-            Log.Information("Loaded {MetricCount} raw metrics from CSV", metrics.Count);
+            var rawNetPurposeMetrics = NetPurposeMetricCsvReader.ReadFromFile(rawMetricsFilePath);
+            Log.Information("Loaded {MetricCount} raw NetPurpose metrics from CSV", rawNetPurposeMetrics.Count);
 
             // 3. Apply raw value lookup
-            NetPurposeRawValueLookupService.ApplyRawValues(issuers, metrics);
+            NetPurposeRawValueLookupService.ApplyRawValues(snowflakeIssuers, rawNetPurposeMetrics);
             Log.Information("Raw value lookup applied");
 
             // 4. Write output CSV with all properties including RawValue fields
-            EsgIssuerCsvWriter.WriteToFile(outputFilePath, issuers);
+            EsgIssuerCsvWriter.WriteToFile(outputFilePath, snowflakeIssuers);
             Log.Information("Output written to {OutputFilePath}", outputFilePath);
 
             Log.Information("Application finished successfully");

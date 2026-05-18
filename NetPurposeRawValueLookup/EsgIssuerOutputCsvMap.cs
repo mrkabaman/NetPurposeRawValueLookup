@@ -41,23 +41,23 @@ public class EsgIssuerOutputCsvMap : ClassMap<EsgIssuer>
         Map(m => m.NetPurposeGrossInsurancePremiumsPreviouslyExcludedMetricValue).Name("NETPURPOSEGROSSINSURANCEPREMIUMSPREVIOUSLYEXCLUDEDMETRICVALUE");
 
         // --- Raw Values ---
-        Map(m => m.NetPurposeEvicRawValue).Name("NETPURPOSEEVICRAWVALUE");
-        Map(m => m.NetPurposeFemaleEmployeesPercentRawValue).Name("NETPURPOSEFEMALEEMPLOYEESPERCENTRAWVALUE");
-        Map(m => m.NetPurposeFemaleManagersPercentRawValue).Name("NETPURPOSEFEMALEMANAGERSPERCENTRAWVALUE");
-        Map(m => m.NetPurposeOperationalWasteGeneratedRawValue).Name("NETPURPOSEOPERATIONALWASTEGENERATEDRAWVALUE");
-        Map(m => m.NetPurposeWaterConsumedRawValue).Name("NETPURPOSEWATERCONSUMEDRAWVALUE");
-        Map(m => m.NetPurposeOperationalWasteRecycledPercentMetricRawValue).Name("NETPURPOSEOPERATIONALWASTERECYCLEDPERCENTMETRICRAWVALUE");
-        Map(m => m.NetPurposeCeoMedianEmployeeCompensationRatioMetricRawValue).Name("NETPURPOSECEOMEDIANEMPLOYEECOMPENSATIONRATIOMETRICRAWVALUE");
-        Map(m => m.NetPurposeFemaleboardMembersPercentMetricRawValue).Name("NETPURPOSEFEMALEBOARDMEMBERSPERCENTMETRICRAWVALUE");
-        Map(m => m.NetPurposeEnergyConsumedRenewablePercentMetricRawValue).Name("NETPURPOSEENERGYCONSUMEDRENEWABLEPERCENTMETRICRAWVALUE");
-        Map(m => m.NetPurposeRandDInvestmentPercentOfRevenueMetricRawValue).Name("NETPURPOSERANDDINVESTMENTPERCENTOFREVENUEMETRICRAWVALUE");
-        Map(m => m.NetPurposeCustomersMetricRawValue).Name("NETPURPOSECUSTOMERSMETRICRAWVALUE");
-        Map(m => m.NetPurposeCustomersPreviouslyExcludedMetricRawValue).Name("NETPURPOSECUSTOMERSPREVIOUSLYEXCLUDEDMETRICRAWVALUE");
-        Map(m => m.NetPurposeNewCustomersMetricRawValue).Name("NETPURPOSENEWCUSTOMERSMETRICRAWVALUE");
-        Map(m => m.NetPurposeNewCustomersPreviouslyExcludedMetricRawValue).Name("NETPURPOSENEWCUSTOMERSPREVIOUSLYEXCLUDEDMETRICRAWVALUE");
-        Map(m => m.NetPurposeInsurancePoliciesPreviouslyExcludedMetricRawValue).Name("NETPURPOSEINSURANCEPOLICIESPREVIOUSLYEXCLUDEDMETRICRAWVALUE");
-        Map(m => m.NetPurposePatientsTreatedMetricRawValue).Name("NETPURPOSEPATIENTSTREATEDMETRICRAWVALUE");
-        Map(m => m.NetPurposeRandDInvestmentMetricRawValue).Name("NETPURPOSERANDDINVESTMENTMETRICRAWVALUE");
-        Map(m => m.NetPurposeGrossInsurancePremiumsPreviouslyExcludedMetricRawValue).Name("NETPURPOSEGROSSINSURANCEPREMIUMSPREVIOUSLYEXCLUDEDMETRICRAWVALUE");
+        Map(m => m.NetPurposeEvicRawValue).Name("NETPURPOSEEVIC_RAWVALUE");
+        Map(m => m.NetPurposeFemaleEmployeesPercentRawValue).Name("NETPURPOSEFEMALEEMPLOYEESPERCENT_RAWVALUE");
+        Map(m => m.NetPurposeFemaleManagersPercentRawValue).Name("NETPURPOSEFEMALEMANAGERSPERCENT_RAWVALUE");
+        Map(m => m.NetPurposeOperationalWasteGeneratedRawValue).Name("NETPURPOSEOPERATIONALWASTEGENERATED_RAWVALUE");
+        Map(m => m.NetPurposeWaterConsumedRawValue).Name("NETPURPOSEWATERCONSUMED_RAWVALUE");
+        Map(m => m.NetPurposeOperationalWasteRecycledPercentMetricRawValue).Name("NETPURPOSEOPERATIONALWASTERECYCLEDPERCENTMETRIC_RAWVALUE");
+        Map(m => m.NetPurposeCeoMedianEmployeeCompensationRatioMetricRawValue).Name("NETPURPOSECEOMEDIANEMPLOYEECOMPENSATIONRATIOMETRIC_RAWVALUE");
+        Map(m => m.NetPurposeFemaleboardMembersPercentMetricRawValue).Name("NETPURPOSEFEMALEBOARDMEMBERSPERCENTMETRIC_RAWVALUE");
+        Map(m => m.NetPurposeEnergyConsumedRenewablePercentMetricRawValue).Name("NETPURPOSEENERGYCONSUMEDRENEWABLEPERCENTMETRIC_RAWVALUE");
+        Map(m => m.NetPurposeRandDInvestmentPercentOfRevenueMetricRawValue).Name("NETPURPOSERANDDINVESTMENTPERCENTOFREVENUEMETRIC_RAWVALUE");
+        Map(m => m.NetPurposeCustomersMetricRawValue).Name("NETPURPOSECUSTOMERSMETRIC_RAWVALUE");
+        Map(m => m.NetPurposeCustomersPreviouslyExcludedMetricRawValue).Name("NETPURPOSECUSTOMERSPREVIOUSLYEXCLUDEDMETRIC_RAWVALUE");
+        Map(m => m.NetPurposeNewCustomersMetricRawValue).Name("NETPURPOSENEWCUSTOMERSMETRIC_RAWVALUE");
+        Map(m => m.NetPurposeNewCustomersPreviouslyExcludedMetricRawValue).Name("NETPURPOSENEWCUSTOMERSPREVIOUSLYEXCLUDEDMETRIC_RAWVALUE");
+        Map(m => m.NetPurposeInsurancePoliciesPreviouslyExcludedMetricRawValue).Name("NETPURPOSEINSURANCEPOLICIESPREVIOUSLYEXCLUDEDMETRIC_RAWVALUE");
+        Map(m => m.NetPurposePatientsTreatedMetricRawValue).Name("NETPURPOSEPATIENTSTREATEDMETRIC_RAWVALUE");
+        Map(m => m.NetPurposeRandDInvestmentMetricRawValue).Name("NETPURPOSERANDDINVESTMENTMETRIC_RAWVALUE");
+        Map(m => m.NetPurposeGrossInsurancePremiumsPreviouslyExcludedMetricRawValue).Name("NETPURPOSEGROSSINSURANCEPREMIUMSPREVIOUSLYEXCLUDEDMETRIC_RAWVALUE");
     }
 }
